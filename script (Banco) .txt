@@ -1,0 +1,72 @@
+CREATE DATABASE sistema;
+USE sistema;
+
+CREATE TABLE adm_filial (
+    cpf CHAR(11) PRIMARY KEY NOT NULL,  # aqui e o campo que faz login e senha dos administradores, para averiguar dados!!
+    nome VARCHAR(100),
+    senha VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE loja (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    localizacao VARCHAR(255),
+    cnpj CHAR(14) UNIQUE NOT NULL,      # campo que cuidara das lojas da sede
+    cpf_dono CHAR(11) NOT NULL,  
+    nome_dono VARCHAR(100),
+    senha VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE funcionario (
+    cpf CHAR(11) PRIMARY KEY NOT NULL,
+    nome VARCHAR(100),                         # tabela que visa cuidar das informações dos funcionarios
+    id_loja INT NOT NULL,
+    cargo VARCHAR(50),
+    salario DECIMAL(10,2),
+    FOREIGN KEY (id_loja) REFERENCES loja(id)
+);
+
+CREATE TABLE fornecedor (
+    cnpj CHAR(14) PRIMARY KEY NOT NULL,              # bem explicativo, tabela dos fornecedores de remedios
+    nome VARCHAR(100)
+);
+
+CREATE TABLE produto (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    generico BOOLEAN,
+    somente_receita BOOLEAN,                          # cuidara dos produtos em geral,
+    validade DATE,
+    quantidade INT,
+    preco_unitario DECIMAL(10,2),
+    desconto_com_cpf BOOLEAN,
+    preco_com_desconto DECIMAL(10,2),
+    cnpj_fornecedor CHAR(14),
+    id_loja INT,
+    FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj),
+    FOREIGN KEY (id_loja) REFERENCES loja(id)
+);
+CREATE TABLE cliente (
+    cod_cliente INT PRIMARY KEY AUTO_INCREMENT,
+    cpf CHAR(11) UNIQUE NOT NULL,                       # fica responsavel pelo cadastro/login
+    nome VARCHAR(100),
+    endereço_cliente VARCHAR(100)
+);
+
+CREATE TABLE venda (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_loja INT,
+    cod_cliente INT NOT NULL,
+    data DATETIME,                                        # Representa uma venda completa (como uma nota fiscal).
+    FOREIGN KEY (id_loja) REFERENCES loja(id),
+    FOREIGN KEY (cod_cliente) REFERENCES cliente(cod_cliente)
+);
+
+CREATE TABLE item_venda (
+    id_venda INT,
+    id_produto INT,
+    quantidade INT,                                           #  Representa os produtos individuais vendidos dentro de uma venda. Cada venda pode ter 1 ou mais produtos — por isso essa tabela é essencial.
+    preco_unitario DECIMAL(10,2),
+    PRIMARY KEY (id_venda, id_produto),
+    FOREIGN KEY (id_venda) REFERENCES venda(id),
+    FOREIGN KEY (id_produto) REFERENCES produto(id)
+);
