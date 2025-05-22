@@ -1,0 +1,81 @@
+
+CREATE DATABASE sistema;
+USE sistema;
+
+
+CREATE TABLE loja (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    localizacao VARCHAR(255),
+    cnpj CHAR(14) UNIQUE,
+    cpf_dono CHAR(11),
+    nome_dono VARCHAR(100),
+    senha VARCHAR(100)
+);
+CREATE TABLE adm_filial (
+    cpf CHAR(11) PRIMARY KEY,
+    nome VARCHAR(100),
+    senha VARCHAR(100),
+    id_loja int,
+    FOREIGN KEY (id_loja) REFERENCES loja(id)
+);
+
+CREATE TABLE funcionario (
+    cpf CHAR(11) PRIMARY KEY,
+    nome VARCHAR(100),
+    id_loja INT,
+    cargo VARCHAR(50),
+    salario DECIMAL(10,2),
+    senha varchar(100),
+    FOREIGN KEY (id_loja) REFERENCES loja(id)
+);
+
+CREATE TABLE fornecedor (
+    cnpj CHAR(14) PRIMARY KEY,
+    nome VARCHAR(100)
+);
+
+CREATE TABLE produto (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(100),
+    generico BOOLEAN,
+    somente_receita BOOLEAN,
+    validade DATE,
+    quantidade INT,
+    preco DECIMAL(10,2),
+    desconto_com_cpf BOOLEAN,
+    preco_com_desconto DECIMAL(10,2),
+    cnpj_fornecedor CHAR(14),
+    id_loja INT,
+    FOREIGN KEY (cnpj_fornecedor) REFERENCES fornecedor(cnpj),
+    FOREIGN KEY (id_loja) REFERENCES loja(id)
+);
+
+CREATE TABLE cliente (
+    cpf CHAR(11) PRIMARY KEY,
+    nome VARCHAR(100)
+);
+
+CREATE TABLE venda (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_loja INT,
+    cpf_cliente CHAR(11),
+    data DATETIME,
+    FOREIGN KEY (id_loja) REFERENCES loja(id),
+    FOREIGN KEY (cpf_cliente) REFERENCES cliente(cpf)
+);
+
+CREATE TABLE item_venda (
+    id_venda INT,
+    id_produto INT,
+    quantidade INT,
+    preco_unitario DECIMAL(10,2),
+    PRIMARY KEY (id_venda, id_produto),
+    FOREIGN KEY (id_venda) REFERENCES venda(id),
+    FOREIGN KEY (id_produto) REFERENCES produto(id)
+);
+
+insert into adm_filial values
+('12345678911','oi','1212');
+
+insert into funcionario (cpf, senha)values
+('98765432199','ooi');
